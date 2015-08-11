@@ -28,19 +28,20 @@ local y = nn.Sigmoid()(nn.CAddTable()({
 
 local model = nn.gModule({x}, {y})
 local criterion = nn.BCECriterion()
-local xx = torch.round(torch.rand(opt.mb, opt.k))
-local yy = torch.sum(xx, 2):apply(function(i) return math.fmod(i, 2)end)
 
 w, dw = model:getParameters()
 w:uniform(-0.08, 0.08)
 optim_state = {learningRate=1.}
+feval = function(w_new, xx, yy)
+    dw:zero()
+    local xx = torch.round(torch.rand(opt.mb, opt.k))
+    local yy = torch.sum(xx, 2):apply(function(i) return math.fmod(i, 2)end)
+    local loss = criterion:forward(model:forward(xx), yy)
+    model:backward(xx, criterion:backward(model.output, yy))
+    return loss, dw
+end
+
 for i=1,opt.iters do
-    feval = function(w_new)
-        dw:zero()
-        local loss = criterion:forward(model:forward(xx), yy)
-        model:backward(xx, criterion:backward(model.output, yy))
-        return loss, dw
-    end
     _, fs = optim.sgd(feval,w, optim_state)
-    print (fs[1])
+    print (torch.exp(fs[1]))
 end 
