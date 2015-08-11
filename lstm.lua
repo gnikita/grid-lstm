@@ -1,7 +1,5 @@
 local lstm = {}
-function lstm.lstm(size)
-    local prev_h = nn.Identity()()
-    local prev_m = nn.Identity()()
+function lstm.lstm(size, prev_h, prev_m)
     local gates = nn.Linear(size, 4*size)(prev_h)
     local reshaped = nn.Reshape(4,size)(gates)
     local n1, n2, n3, n4 = nn.SplitTable(2)(reshaped):split(4)
@@ -14,7 +12,6 @@ function lstm.lstm(size)
         nn.CMulTable()({input_gate, memory_transform})
       })
     local next_h = nn.CMulTable()({output_gate, nn.Tanh()(next_m)})
-    local model = nn.gModule({prev_h, prev_m}, {next_h, next_m})
-    return model
+    return next_h, next_m
 end
 return lstm

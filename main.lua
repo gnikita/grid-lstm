@@ -13,14 +13,18 @@ opt = cmd:parse(arg)
 
 local x = nn.Identity()()
 
-local h0 = nn.Linear(opt.size, opt.k)(x)
-local m0 = nn.Linear(opt.size, opt.k)(x)
-local hn, mn = unpack(unigrid.unigrid(opt.n, opt.size)({h0, m0}))
+local h0 = nn.Linear(opt.k, opt.size)(x)
+local m0 = nn.Linear(opt.k, opt.size)(x)
+local h, m = unigrid.unigrid(opt.size, opt.n, h0, m0)
 
 
-local y = nn.CAddTable()({
-    nn.Linear(1, opt.size)(hn), 
-    nn.Linear(1, opt.size)(mn)
-})
+--local y = nn.CAddTable()({
+  --  nn.Linear(1, opt.size)(hn), 
+    --nn.Linear(1, opt.size)(mn)
+--})
 
-local model = nn.gModule({x}, {hn, mn})
+local model = nn.gModule({x}, {h, m})
+--xx = torch.randn(opt.k)
+--model:forward(xx)
+
+graph.dot(model.fg, 'mlp', 'mymlp')
