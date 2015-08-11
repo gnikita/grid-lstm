@@ -32,7 +32,7 @@ local criterion = nn.BCECriterion()
 w, dw = model:getParameters()
 w:uniform(-0.08, 0.08)
 optim_state = {learningRate=1.}
-feval = function(w_new, xx, yy)
+feval = function(w_new)
     dw:zero()
     local xx = torch.round(torch.rand(opt.mb, opt.k))
     local yy = torch.sum(xx, 2):apply(function(i) return math.fmod(i, 2)end)
