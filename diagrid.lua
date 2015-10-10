@@ -1,6 +1,6 @@
 local lstm = require 'lstm'
 local diagrid = {}
-function unigrid.unigrid(size, n, prev_h, prev_m)
+function diagrid.diagrid(size, n, prev_h, prev_m)
     local h = prev_h
     local m = prev_m
     for i=1,n do
